@@ -87,11 +87,11 @@ onMounted(loadUser);
           <img
             :src="user.avatar"
             class="navbar-avatar"
-            :alt="user.login"
+            :alt="user.uid"
           >
 
           <span>
-            {{ user.login }}
+            {{ user.uid }}
           </span>
 
         </button>
@@ -131,7 +131,7 @@ onMounted(loadUser);
                     </h2>
 
                     <p class="text-muted mb-4">
-                      {{ user.login }}
+                      {{ user.uid }}
                     </p>
 
                     <!-- Level + Progress -->

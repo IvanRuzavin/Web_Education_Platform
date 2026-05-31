@@ -8,7 +8,7 @@
 .dashboard {
   display: flex;
   min-height: 100vh;
-  background: #f4f6f9;
+  background: #0e2342;
 }
 
 .sidebar {
