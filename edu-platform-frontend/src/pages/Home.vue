@@ -1,50 +1,56 @@
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
+import api from "../services/api";
+import { useRouter } from "vue-router";
 
-const profile = {
-  fullName: 'Ivan Ruzavin',
-  login: 'iruzavin',
-  level: 6,
-  progress: 75,
-  experience: 4500,
-  rank: 3,
-  avatar:
-    'https://avatars.githubusercontent.com/u/583231?v=4'
-}
+const user = ref(null);
+const router = useRouter();
 
+const uid = localStorage.getItem("uid");
+
+const loadUser = async () => {
+  const res = await api.get(`/users/${uid}`);
+  user.value = res.data;
+};
+
+const goGraph = () => router.push("/graph");
+const goSettings = () => router.push("/settings");
+
+onMounted(loadUser);
 </script>
 
 <template>
 
 <div class="hero">
 
-  <div class="profile-card">
+  <div class="profile-card" v-if="user">
+
 
     <img
-      :src="profile.avatar"
+      :src=user.avatar
       class="avatar"
     >
-
-    <div>
+    <div v-if="user">
 
       <h1>
-        {{ profile.fullName }}
+        {{ user.name }} {{ user.surname }}
       </h1>
 
       <h5>
-        {{ profile.login }}
+        {{ user.login }}
       </h5>
 
       <h3>
-        Level {{ profile.level }}
+        Level {{ user.level }}
       </h3>
 
       <div class="progress mt-3">
 
         <div
           class="progress-bar"
-          :style="{width: profile.progress + '%'}"
+          :style="{width: user.progress + '%'}"
         >
-          {{ profile.progress }}%
+          {{ user.progress }}%
         </div>
 
       </div>
@@ -61,10 +67,10 @@ const profile = {
 
     <div class="col-md-4">
 
-      <div class="card stat-card">
+      <div class="card stat-card" v-if="user">
 
         <h2>
-          {{ profile.experience }}
+          {{ user.experience }}
         </h2>
 
         <p>XP</p>
@@ -75,10 +81,10 @@ const profile = {
 
     <div class="col-md-4">
 
-      <div class="card stat-card">
+      <div class="card stat-card" v-if="user">
 
         <h2>
-          {{ profile.rank }}
+          {{ user.rank }}
         </h2>
 
         <p>Rank</p>
@@ -111,7 +117,7 @@ const profile = {
 
     <div class="col-md-6">
 
-      <button class="btn btn-primary w-100">
+      <button class="btn btn-primary w-100" @click="goGraph">
         Project Graph
       </button>
 
@@ -119,7 +125,7 @@ const profile = {
 
     <div class="col-md-6">
 
-      <button class="btn btn-success w-100">
+      <button class="btn btn-success w-100" @click="goSettings">
         Update Profile
       </button>
 
@@ -131,15 +137,15 @@ const profile = {
 
 <div class="container mt-4">
 
-  <div class="card p-4">
+  <div class="card p-4" v-if="user">
 
     <h4>Personal Information</h4>
 
     <hr>
 
-    <p>Email: ivan@example.com</p>
+    <p>Email: {{ user.email }}</p>
 
-    <p>Location: Belgrade</p>
+    <p>Born in {{ user.birthplace }}</p>
 
     <p>Role: Embedded Developer</p>
 
