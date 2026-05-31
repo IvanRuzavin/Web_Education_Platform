@@ -8,176 +8,331 @@ const router = useRouter();
 
 const uid = localStorage.getItem("uid");
 
-const loadUser = async () => {
-  const res = await api.get(`/users/${uid}`);
-  user.value = res.data;
+const animatedProgress = ref(0);
+
+const animateProgress = (target: number) => {
+
+  animatedProgress.value = 0;
+
+  const interval = setInterval(() => {
+
+    if (animatedProgress.value >= target) {
+      clearInterval(interval);
+      return;
+    }
+
+    animatedProgress.value++;
+
+  }, 15);
 };
 
-const goGraph = () => router.push("/graph");
-const goSettings = () => router.push("/settings");
+const loadUser = async () => {
+
+  const res = await api.get(`/users/${uid}`);
+
+  user.value = res.data;
+
+  animateProgress(res.data.progress);
+};
 
 onMounted(loadUser);
 </script>
 
 <template>
 
-<div class="hero">
+  <div class="dashboard">
 
-  <div class="profile-card" v-if="user">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
 
+      <button
+        class="sidebar-home"
+        @click="router.push('/home')"
+      >
+        <i class="bi bi-house-fill"></i>
+        <span>Home</span>
+      </button>
 
-    <img
-      :src=user.avatar
-      class="avatar"
-    >
-    <div v-if="user">
+      <button
+        class="sidebar-icon"
+        @click="router.push('/graph')"
+      >
+        <i class="bi bi-graph-up"></i>
+      </button>
 
-      <h1>
-        {{ user.name }} {{ user.surname }}
-      </h1>
+      <button
+        class="sidebar-icon"
+        @click="router.push('/settings')"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </button>
 
-      <h5>
-        {{ user.login }}
-      </h5>
+    </aside>
 
-      <h3>
-        Level {{ user.level }}
-      </h3>
+    <!-- RIGHT SIDE -->
+    <div class="main-content">
 
-      <div class="progress mt-3">
+      <!-- TOP NAVBAR -->
+      <nav class="top-navbar" v-if="user">
 
-        <div
-          class="progress-bar"
-          :style="{width: user.progress + '%'}"
+        <div class="navbar-title">
+          Embedded EDU Platform
+        </div>
+
+        <button
+          class="user-navbar-btn"
+          @click="router.push('/home')"
         >
-          {{ user.progress }}%
+
+          <img
+            :src="user.avatar"
+            class="navbar-avatar"
+            :alt="user.login"
+          >
+
+          <span>
+            {{ user.login }}
+          </span>
+
+        </button>
+
+      </nav>
+
+      <!-- PAGE CONTENT -->
+      <div class="container-fluid mt-4" v-if="user">
+
+        <div class="row g-3 align-items-stretch">
+
+          <!-- LEFT -->
+          <div class="col-lg-8">
+
+            <div class="card shadow-sm profile-card  h-100">
+
+              <div class="card-body">
+
+                <div class="row align-items-center">
+
+                  <!-- Avatar -->
+                  <div class="col-md-3 text-center">
+
+                    <img
+                      :src="user.avatar"
+                      :alt="user.name"
+                      class="profile-avatar"
+                    >
+
+                  </div>
+
+                  <!-- Main Profile Data -->
+                  <div class="col-md-9">
+
+                    <h2 class="fw-bold mb-1">
+                      {{ user.name }} {{ user.surname }}
+                    </h2>
+
+                    <p class="text-muted mb-4">
+                      {{ user.login }}
+                    </p>
+
+                    <!-- Level + Progress -->
+                    <div class="d-flex align-items-end gap-3 mb-3">
+
+                      <div class="level-display">
+                        {{ user.level }}
+                      </div>
+
+                      <div class="flex-grow-1">
+
+                        <div class="d-flex justify-content-between mb-1">
+
+                          <span>
+                            {{ animatedProgress }}%
+                          </span>
+
+                          <span>
+                            Embedded Developer
+                          </span>
+
+                        </div>
+
+                        <div class="progress profile-progress">
+
+                          <div
+                            class="progress-bar"
+                            role="progressbar"
+                            :style="{ width: animatedProgress + '%' }"
+                          >
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <!-- Bottom Stats -->
+              <div class="profile-stats">
+
+                <div>
+                  <strong>XP</strong>
+                  <div>{{ user.experience }}</div>
+                </div>
+
+                <div>
+                  <strong>Rank</strong>
+                  <div>{{ user.rank }}</div>
+                </div>
+
+                <div>
+                  <strong>Projects</strong>
+                  <div>12</div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="col-lg-4">
+
+            <!-- GRAPH BUTTON -->
+            <button
+              class="btn btn-primary w-100 mb-3"
+              @click="router.push('/graph')"
+            >
+              <i class="bi bi-graph-up"></i>
+              Project Graph
+            </button>
+
+            <!-- SETTINGS BUTTON -->
+            <button
+              class="btn btn-success w-100 mb-3"
+              @click="router.push('/settings')"
+            >
+              <i class="bi bi-pencil-square"></i>
+              Update Profile
+            </button>
+
+            <!-- PERSONAL INFO -->
+            <div class="card shadow-sm  h-80">
+
+              <div class="card-header">
+                <h5 class="mb-0">
+                  Personal Information
+                </h5>
+              </div>
+
+              <ul class="list-group list-group-flush">
+
+                <li class="list-group-item">
+                  <i class="bi bi-envelope"></i>
+                  {{ user.email }}
+                </li>
+
+                <li class="list-group-item">
+                  <i class="bi bi-telephone"></i>
+                  {{ user.phone }}
+                </li>
+
+                <li class="list-group-item">
+                  <i class="bi bi-geo-alt"></i>
+                  {{ user.birthplace }}
+                </li>
+
+                <li class="list-group-item">
+                  <i class="bi bi-person-workspace"></i>
+                  Embedded Developer
+                </li>
+
+              </ul>
+
+            </div>
+
+          </div>
+
         </div>
 
       </div>
 
-    </div>
+      <!-- LOADING -->
+      <div
+        v-else
+        class="text-center mt-5"
+      >
 
-  </div>
+        <div class="spinner-border"></div>
 
-</div>
-
-<div class="container mt-4">
-
-  <div class="row">
-
-    <div class="col-md-4">
-
-      <div class="card stat-card" v-if="user">
-
-        <h2>
-          {{ user.experience }}
-        </h2>
-
-        <p>XP</p>
-
-      </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-      <div class="card stat-card" v-if="user">
-
-        <h2>
-          {{ user.rank }}
-        </h2>
-
-        <p>Rank</p>
-
-      </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-      <div class="card stat-card">
-
-        <h2>
-          12
-        </h2>
-
-        <p>Projects</p>
+        <h5 class="mt-3">
+          Loading profile...
+        </h5>
 
       </div>
 
     </div>
 
   </div>
-
-</div>
-
-<div class="container mt-4">
-
-  <div class="row">
-
-    <div class="col-md-6">
-
-      <button class="btn btn-primary w-100" @click="goGraph">
-        Project Graph
-      </button>
-
-    </div>
-
-    <div class="col-md-6">
-
-      <button class="btn btn-success w-100" @click="goSettings">
-        Update Profile
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-<div class="container mt-4">
-
-  <div class="card p-4" v-if="user">
-
-    <h4>Personal Information</h4>
-
-    <hr>
-
-    <p>Email: {{ user.email }}</p>
-
-    <p>Born in {{ user.birthplace }}</p>
-
-    <p>Role: Embedded Developer</p>
-
-  </div>
-
-</div>
 
 </template>
 
 <style scoped>
 
-.hero {
-  background: #20232a;
-  padding: 50px;
-  color: white;
+.progress {
+  height: 25px;
 }
 
 .profile-card {
-  display: flex;
-  gap: 30px;
-  align-items: center;
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
-.avatar {
-  width: 150px;
-  height: 150px;
+.profile-avatar {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
   border-radius: 50%;
+  border: 4px solid #0d6efd;
 }
 
-.stat-card {
+.level-display {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 80px;
+}
+
+.profile-progress {
+  height: 12px;
+  border-radius: 10px;
+}
+
+.profile-progress .progress-bar {
+  transition: width 0.15s ease;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px;
+  border-top: 1px solid #dee2e6;
+  background: #f8f9fa;
+}
+
+.profile-stats div {
   text-align: center;
-  padding: 20px;
+}
+
+.profile-stats strong {
+  display: block;
+  margin-bottom: 4px;
 }
 
 </style>
