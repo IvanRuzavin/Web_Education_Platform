@@ -57,7 +57,7 @@ onMounted(loadUser);
         class="sidebar-icon"
         @click="router.push('/graph')"
       >
-        <i class="bi bi-graph-up"></i>
+        <i class="bi bi-cpu"></i>
       </button>
 
       <button
@@ -208,7 +208,7 @@ onMounted(loadUser);
               class="btn btn-primary w-100 mb-3"
               @click="router.push('/graph')"
             >
-              <i class="bi bi-graph-up"></i>
+              <i class="bi bi-cpu"></i>
               Project Graph
             </button>
 
