@@ -477,7 +477,7 @@ const selectAvatar = (url: string) => {
         class="sidebar-icon"
         @click="router.push('/graph')"
       >
-        <i class="bi bi-graph-up"></i>
+        <i class="bi bi-cpu"></i>
       </button>
 
       <button
