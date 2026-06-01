@@ -35,7 +35,8 @@ const loadUser = async () => {
     email: user.value.email,
     birthplace: user.value.birthplace,
     phone: user.value.phone,
-    is_online: 1
+    is_online: 1,
+    status: user.value.status
   });
   selectedUser.value = res.data;
   animateProgress(res.data.progress);
@@ -69,7 +70,8 @@ const logout = async () => {
     email: u.email,
     birthplace: u.birthplace,
     phone: u.phone,
-    is_online: 0
+    is_online: 0,
+    status: u.status
   });
 
   localStorage.removeItem("uid");
@@ -254,7 +256,7 @@ onMounted(async () => {
 
                 <li class="list-group-item">
                   <i class="bi bi-person-workspace"></i>
-                  Embedded Developer
+                  {{ user.status }}
                 </li>
 
               </ul>

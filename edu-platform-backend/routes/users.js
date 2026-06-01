@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   db.all(
-    `SELECT uid, name, surname, avatar, is_online, level, rank, progress, experience
+    `SELECT uid, name, surname, avatar, is_online, level, rank, progress, experience, status
      FROM Users`,
     [],
     (err, rows) => {
@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 router.get("/:uid", (req,res)=>{
 
     db.get(
-        "SELECT uid,name,surname,progress,experience,level,rank,avatar,email,birthplace,phone FROM Users WHERE uid=?",
+        "SELECT uid,name,surname,progress,experience,level,rank,avatar,email,birthplace,phone,status FROM Users WHERE uid=?",
         [req.params.uid],
         (err,row)=>{
 
@@ -34,7 +34,8 @@ router.put("/:uid", (req, res) => {
     email,
     birthplace,
     phone,
-    is_online
+    is_online,
+    status
   } = req.body;
 
   let query = `
@@ -45,6 +46,7 @@ router.put("/:uid", (req, res) => {
       birthplace = ?,
       phone = ?,
       is_online = ?
+      ${status ? ", status = ?" : ""}
       ${password ? ", password = ?" : ""}
     WHERE uid = ?
   `;
@@ -54,7 +56,8 @@ router.put("/:uid", (req, res) => {
     email,
     birthplace,
     phone,
-    is_online
+    is_online,
+    status
   ];
 
   if (password) {

@@ -16,7 +16,8 @@ db.serialize(() => {
         email TEXT,
         birthplace TEXT,
         phone TEXT,
-        is_online INTEGER NOT NULL
+        is_online INTEGER NOT NULL,
+        status TEXT
     )
     `);
 

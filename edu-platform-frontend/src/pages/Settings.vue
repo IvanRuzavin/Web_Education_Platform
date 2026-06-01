@@ -416,6 +416,7 @@ const uidValue = ref("");
 const name = ref("");
 const surname = ref("");
 const avatar = ref("");
+const status = ref("");
 
 const email = ref("");
 const birthplace = ref("");
@@ -430,6 +431,7 @@ onMounted(async () => {
   uidValue.value = res.data.uid;
   name.value = res.data.name;
   surname.value = res.data.surname;
+  status.value = res.data.status;
 
   avatar.value = res.data.avatar;
 
@@ -446,7 +448,10 @@ const save = async () => {
 
     email: email.value,
     birthplace: birthplace.value,
-    phone: phone.value
+    phone: phone.value,
+    is_online: 1,
+
+    status: status.value
   });
 
   alert("Profile updated");
@@ -610,6 +615,19 @@ const selectAvatar = (url: string) => {
                 type="password"
                 class="form-control"
                 v-model="password"
+              >
+
+            </div>
+
+            <div class="col-md-12">
+
+              <label class="form-label">
+                Status
+              </label>
+
+              <input
+                class="form-control"
+                v-model="status"
               >
 
             </div>
