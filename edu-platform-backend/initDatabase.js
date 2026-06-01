@@ -15,7 +15,8 @@ db.serialize(() => {
         avatar TEXT NOT NULL,
         email TEXT,
         birthplace TEXT,
-        phone TEXT
+        phone TEXT,
+        is_online INTEGER NOT NULL
     )
     `);
 

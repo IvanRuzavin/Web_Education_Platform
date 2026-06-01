@@ -3,6 +3,18 @@ const db = require("../db");
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  db.all(
+    `SELECT uid, name, surname, avatar, is_online, level, rank, progress, experience
+     FROM Users`,
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).send(err);
+      res.json(rows);
+    }
+  );
+});
+
 router.get("/:uid", (req,res)=>{
 
     db.get(
@@ -21,7 +33,8 @@ router.put("/:uid", (req, res) => {
     avatar,
     email,
     birthplace,
-    phone
+    phone,
+    is_online
   } = req.body;
 
   let query = `
@@ -30,7 +43,8 @@ router.put("/:uid", (req, res) => {
       avatar = ?,
       email = ?,
       birthplace = ?,
-      phone = ?
+      phone = ?,
+      is_online = ?
       ${password ? ", password = ?" : ""}
     WHERE uid = ?
   `;
@@ -39,7 +53,8 @@ router.put("/:uid", (req, res) => {
     avatar,
     email,
     birthplace,
-    phone
+    phone,
+    is_online
   ];
 
   if (password) {

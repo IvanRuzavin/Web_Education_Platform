@@ -1,171 +1,190 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import api from "../services/api";
 import { useRouter } from "vue-router";
 
-const user = ref(null);
 const router = useRouter();
+
+const user = ref<any>(null);
+const users = ref<any[]>([]);
+const selectedUser = ref<any>(null);
 
 const uid = localStorage.getItem("uid");
 
+// progress animation
 const animatedProgress = ref(0);
 
 const animateProgress = (target: number) => {
-
   animatedProgress.value = 0;
-
   const interval = setInterval(() => {
-
     if (animatedProgress.value >= target) {
       clearInterval(interval);
       return;
     }
-
     animatedProgress.value++;
-
   }, 15);
 };
 
+// LOAD CURRENT USER
 const loadUser = async () => {
-
   const res = await api.get(`/users/${uid}`);
-
   user.value = res.data;
-
+  await api.put(`/users/${uid}`, {
+    password: user.value.password,
+    avatar: user.value.avatar,
+    email: user.value.email,
+    birthplace: user.value.birthplace,
+    phone: user.value.phone,
+    is_online: 1
+  });
+  selectedUser.value = res.data;
   animateProgress(res.data.progress);
 };
 
-onMounted(loadUser);
+// LOAD ALL USERS
+const loadUsers = async () => {
+  const res = await api.get(`/users`);
+  users.value = res.data;
+};
+
+// CLICK USER CARD
+const openUser = (u: any) => {
+  selectedUser.value = u;
+  animateProgress(u.progress);
+};
+
+// LOGOUT
+const logout = async () => {
+  const u = user.value;
+
+  await api.put(`/users/${uid}`, {
+    password: u.password,
+    name: u.name,
+    surname: u.surname,
+    progress: u.progress,
+    experience: u.experience,
+    level: u.level,
+    rank: u.rank,
+    avatar: u.avatar,
+    email: u.email,
+    birthplace: u.birthplace,
+    phone: u.phone,
+    is_online: 0
+  });
+
+  localStorage.removeItem("uid");
+  router.push("/");
+};
+
+// COMPUTED → are we viewing self?
+const isSelf = computed(() => {
+  return selectedUser.value?.uid === user.value?.uid;
+});
+
+onMounted(async () => {
+  await loadUser();
+
+  window.addEventListener("beforeunload", () => {
+    navigator.sendBeacon(
+      `http://localhost:5000/users/${uid}`,
+      new Blob([JSON.stringify({ is_online: 0 })], {
+        type: "application/json"
+      })
+    );
+  });
+
+  await loadUsers();
+});
 </script>
 
 <template>
 
-  <div class="dashboard">
+<div class="dashboard">
 
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <button class="sidebar-home" @click="router.push('/home')">
+      <i class="bi bi-house-fill"></i>
+      <span>Home</span>
+    </button>
 
-      <button
-        class="sidebar-home"
-        @click="router.push('/home')"
-      >
-        <i class="bi bi-house-fill"></i>
-        <span>Home</span>
-      </button>
+    <button class="sidebar-icon" @click="router.push('/graph')">
+      <i class="bi bi-cpu"></i>
+    </button>
 
-      <button
-        class="sidebar-icon"
-        @click="router.push('/graph')"
-      >
-        <i class="bi bi-cpu"></i>
-      </button>
+    <button class="sidebar-icon" @click="router.push('/settings')">
+      <i class="bi bi-gear-fill"></i>
+    </button>
+  </aside>
 
-      <button
-        class="sidebar-icon"
-        @click="router.push('/settings')"
-      >
-        <i class="bi bi-gear-fill"></i>
-      </button>
+  <div class="main-content">
 
-    </aside>
+    <!-- NAVBAR -->
+    <nav class="top-navbar" v-if="user">
 
-    <!-- RIGHT SIDE -->
-    <div class="main-content">
+      <div class="navbar-title">
+        Embedded EDU Platform
+      </div>
 
-      <!-- TOP NAVBAR -->
-      <nav class="top-navbar" v-if="user">
-
-        <div class="navbar-title">
-          Embedded EDU Platform
-        </div>
-
-        <button
-          class="user-navbar-btn"
-          @click="router.push('/home')"
-        >
-
-          <img
-            :src="user.avatar"
-            class="navbar-avatar"
-            :alt="user.uid"
-          >
-
-          <span>
-            {{ user.uid }}
-          </span>
-
+      <!-- USER DROPDOWN -->
+      <div class="user-menu">
+        <button class="user-navbar-btn">
+          <img :src="user.avatar" class="navbar-avatar" />
+          <span>{{ user.uid }}</span>
         </button>
 
-      </nav>
+        <div class="dropdown">
+          <button class="dropdown-item" @click="logout">
+            Logout
+          </button>
+        </div>
+      </div>
 
-      <!-- PAGE CONTENT -->
-      <div class="container-fluid mt-4" v-if="user">
+    </nav>
 
-        <div class="row g-3 align-items-stretch">
+    <!-- CONTENT -->
+    <div class="container-fluid mt-4" v-if="selectedUser">
 
-          <!-- LEFT -->
-          <div class="col-lg-8">
+      <div class="row g-3">
 
-            <div class="card shadow-sm profile-card  h-100">
+        <!-- PROFILE -->
+        <div class="col-lg-8">
 
-              <div class="card-body">
+          <div class="card shadow-sm profile-card h-100">
 
-                <div class="row align-items-center">
+            <div class="card-body">
 
-                  <!-- Avatar -->
-                  <div class="col-md-3 text-center">
+              <div class="row align-items-center">
 
-                    <img
-                      :src="user.avatar"
-                      :alt="user.name"
-                      class="profile-avatar"
-                    >
+                <div class="col-md-3 text-center">
+                  <img :src="selectedUser.avatar" class="profile-avatar" />
+                </div>
 
-                  </div>
+                <div class="col-md-9">
 
-                  <!-- Main Profile Data -->
-                  <div class="col-md-9">
+                  <h2 class="fw-bold">
+                    {{ selectedUser.name }} {{ selectedUser.surname }}
+                  </h2>
 
-                    <h2 class="fw-bold mb-1">
-                      {{ user.name }} {{ user.surname }}
-                    </h2>
+                  <p class="text-muted">{{ selectedUser.uid }}</p>
 
-                    <p class="text-muted mb-4">
-                      {{ user.uid }}
-                    </p>
+                  <div class="d-flex align-items-end gap-3 mb-3">
 
-                    <!-- Level + Progress -->
-                    <div class="d-flex align-items-end gap-3 mb-3">
+                    <div class="level-display">
+                      {{ selectedUser.level }}
+                    </div>
 
-                      <div class="level-display">
-                        {{ user.level }}
+                    <div class="flex-grow-1">
+
+                      <div class="d-flex justify-content-between">
+                        <span>{{ animatedProgress }}%</span>
                       </div>
 
-                      <div class="flex-grow-1">
-
-                        <div class="d-flex justify-content-between mb-1">
-
-                          <span>
-                            {{ animatedProgress }}%
-                          </span>
-
-                          <span>
-                            Embedded Developer
-                          </span>
-
-                        </div>
-
-                        <div class="progress profile-progress">
-
-                          <div
-                            class="progress-bar"
-                            role="progressbar"
-                            :style="{ width: animatedProgress + '%' }"
-                          >
-                          </div>
-
-                        </div>
-
+                      <div class="progress profile-progress">
+                        <div
+                          class="progress-bar"
+                          :style="{ width: animatedProgress + '%' }"
+                        ></div>
                       </div>
 
                     </div>
@@ -176,50 +195,36 @@ onMounted(loadUser);
 
               </div>
 
-              <!-- Bottom Stats -->
-              <div class="profile-stats">
+            </div>
 
-                <div>
-                  <strong>XP</strong>
-                  <div>{{ user.experience }}</div>
-                </div>
-
-                <div>
-                  <strong>Rank</strong>
-                  <div>{{ user.rank }}</div>
-                </div>
-
-                <div>
-                  <strong>Projects</strong>
-                  <div>12</div>
-                </div>
-
-              </div>
-
+            <div class="profile-stats">
+              <div><strong>XP</strong><div>{{ selectedUser.experience }}</div></div>
+              <div><strong>Rank</strong><div>{{ selectedUser.rank }}</div></div>
+              <div><strong>Projects</strong><div>12</div></div>
             </div>
 
           </div>
 
-          <!-- RIGHT COLUMN -->
-          <div class="col-lg-4">
+        </div>
 
-            <!-- GRAPH BUTTON -->
-            <button
-              class="btn btn-primary w-100 mb-3"
-              @click="router.push('/graph')"
-            >
-              <i class="bi bi-cpu"></i>
-              Project Graph
-            </button>
+        <!-- RIGHT -->
+        <div class="col-lg-4">
 
-            <!-- SETTINGS BUTTON -->
-            <button
-              class="btn btn-success w-100 mb-3"
-              @click="router.push('/settings')"
-            >
-              <i class="bi bi-pencil-square"></i>
-              Update Profile
-            </button>
+          <button
+            class="btn btn-primary w-100 mb-3"
+            @click="router.push('/graph')"
+          >
+            Project Graph
+          </button>
+
+          <!-- ONLY IF SELF -->
+          <button
+            v-if="isSelf"
+            class="btn btn-success w-100 mb-3"
+            @click="router.push('/settings')"
+          >
+            Update Profile
+          </button>
 
             <!-- PERSONAL INFO -->
             <div class="card shadow-sm  h-80">
@@ -253,6 +258,36 @@ onMounted(loadUser);
                 </li>
 
               </ul>
+            </div>
+
+
+          </div>
+          <!-- USERS LIST -->
+          <div class="card shadow-sm">
+
+            <div class="card-header">
+              <h5>People Online</h5>
+            </div>
+
+            <div class="list-group">
+
+              <div
+                v-for="u in users"
+                :key="u.uid"
+                class="list-group-item user-card"
+                @click="openUser(u)"
+              >
+
+                <img :src="u.avatar" class="user-avatar" />
+
+                <span>{{ u.uid }}</span>
+
+                <span
+                  class="status-dot"
+                  :class="u.is_online ? 'online' : 'offline'"
+                ></span>
+
+              </div>
 
             </div>
 
@@ -262,23 +297,9 @@ onMounted(loadUser);
 
       </div>
 
-      <!-- LOADING -->
-      <div
-        v-else
-        class="text-center mt-5"
-      >
-
-        <div class="spinner-border"></div>
-
-        <h5 class="mt-3">
-          Loading profile...
-        </h5>
-
-      </div>
-
-    </div>
-
   </div>
+
+</div>
 
 </template>
 
@@ -333,6 +354,59 @@ onMounted(loadUser);
 .profile-stats strong {
   display: block;
   margin-bottom: 4px;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.user-menu:hover .dropdown {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.online {
+  background: #22c55e;
+}
+
+.offline {
+  background: #9ca3af;
 }
 
 </style>
