@@ -24,7 +24,8 @@ db.serialize(() => {
     db.run(`
     CREATE TABLE IF NOT EXISTS Projects(
         project_id TEXT PRIMARY KEY,
-        complexity INTEGER
+        complexity INTEGER,
+        project_name NOT NULL,
     )
     `);
 

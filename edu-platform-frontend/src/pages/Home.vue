@@ -5,6 +5,8 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const projects = ref<any[]>([]);
+
 const user = ref<any>(null);
 const users = ref<any[]>([]);
 const selectedUser = ref<any>(null);
@@ -25,6 +27,11 @@ const animateProgress = (target: number) => {
   }, 15);
 };
 
+const loadProjects = async (uid: string) => {
+  const res = await api.get(`/projects/${uid}`);
+  projects.value = res.data;
+};
+
 // LOAD CURRENT USER
 const loadUser = async () => {
   const res = await api.get(`/users/${uid}`);
@@ -40,6 +47,7 @@ const loadUser = async () => {
   });
   selectedUser.value = res.data;
   animateProgress(res.data.progress);
+  await loadProjects(user.value.uid);
 };
 
 // LOAD ALL USERS
@@ -49,9 +57,13 @@ const loadUsers = async () => {
 };
 
 // CLICK USER CARD
-const openUser = (u: any) => {
-  selectedUser.value = u;
-  animateProgress(u.progress);
+const openUser = async (u: any) => {
+  const res = await api.get(`/users/${u.uid}`);
+  selectedUser.value = res.data;
+
+  animateProgress(res.data.progress);
+
+  await loadProjects(u.uid);
 };
 
 // LOGOUT
@@ -202,7 +214,13 @@ onMounted(async () => {
             <div class="profile-stats">
               <div><strong>XP</strong><div>{{ selectedUser.experience }}</div></div>
               <div><strong>Rank</strong><div>{{ selectedUser.rank }}</div></div>
-              <div><strong>Projects</strong><div>12</div></div>
+              <div>
+                <strong>Projects</strong>
+                <div v-if="projects.length === 0">
+                  No projects yet
+                </div>
+                <div v-if="projects.length > 0">{{ projects.length }}</div>
+              </div>
             </div>
 
           </div>
@@ -241,22 +259,22 @@ onMounted(async () => {
 
                 <li class="list-group-item">
                   <i class="bi bi-envelope"></i>
-                  {{ user.email }}
+                  {{ selectedUser.email }}
                 </li>
 
                 <li class="list-group-item">
                   <i class="bi bi-telephone"></i>
-                  {{ user.phone }}
+                  {{ selectedUser.phone }}
                 </li>
 
                 <li class="list-group-item">
                   <i class="bi bi-geo-alt"></i>
-                  {{ user.birthplace }}
+                  {{ selectedUser.birthplace }}
                 </li>
 
                 <li class="list-group-item">
                   <i class="bi bi-person-workspace"></i>
-                  {{ user.status }}
+                  {{ selectedUser.status }}
                 </li>
 
               </ul>
@@ -264,36 +282,67 @@ onMounted(async () => {
 
 
           </div>
-          <!-- USERS LIST -->
-          <div class="card shadow-sm">
+          <div class="row g-3">
 
-            <div class="card-header">
-              <h5>People Online</h5>
-            </div>
+            <!-- USERS -->
+            <div class="col-lg-6">
+              <div class="card shadow-sm">
 
-            <div class="list-group">
+                <div class="card-header">
+                  <h5>People Online</h5>
+                </div>
 
-              <div
-                v-for="u in users"
-                :key="u.uid"
-                class="list-group-item user-card"
-                @click="openUser(u)"
-              >
-
-                <img :src="u.avatar" class="user-avatar" />
-
-                <span>{{ u.uid }}</span>
-
-                <span
-                  class="status-dot"
-                  :class="u.is_online ? 'online' : 'offline'"
-                ></span>
+                <div class="list-group">
+                  <div
+                    v-for="u in users"
+                    :key="u.uid"
+                    class="list-group-item user-card"
+                    @click="openUser(u)"
+                  >
+                    <img :src="u.avatar" class="user-avatar" />
+                    <span>{{ u.uid }}</span>
+                    <span
+                      class="status-dot"
+                      :class="u.is_online ? 'online' : 'offline'"
+                    ></span>
+                  </div>
+                </div>
 
               </div>
+            </div>
 
+            <!-- PROJECTS -->
+            <div class="col-lg-6">
+              <div class="card shadow-sm">
+
+                <div class="card-header">
+                  <h5>User Projects</h5>
+                </div>
+
+                <div class="list-group">
+
+                  <div
+                    v-for="p in projects"
+                    :key="p.project_name"
+                    class="list-group-item project-item"
+                  >
+                    <span>{{ p.project_name }}</span>
+
+                    <span
+                      class="project-score"
+                      :class="p.score >= 85 ? 'good' : 'bad'"
+                    >
+                      {{ p.score }}
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
             </div>
 
           </div>
+
 
         </div>
 
@@ -409,6 +458,27 @@ onMounted(async () => {
 
 .offline {
   background: #9ca3af;
+}
+
+.project-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.project-score {
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: white;
+}
+
+.good {
+  background: #22c55e; /* green */
+}
+
+.bad {
+  background: #ef4444; /* red */
 }
 
 </style>

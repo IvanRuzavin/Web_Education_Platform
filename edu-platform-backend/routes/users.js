@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   db.all(
-    `SELECT uid, name, surname, avatar, is_online, level, rank, progress, experience, status
+    `SELECT uid,name,surname,progress,experience,level,rank,avatar,email,birthplace,phone,status,is_online
      FROM Users`,
     [],
     (err, rows) => {
@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 router.get("/:uid", (req,res)=>{
 
     db.get(
-        "SELECT uid,name,surname,progress,experience,level,rank,avatar,email,birthplace,phone,status FROM Users WHERE uid=?",
+        "SELECT uid,name,surname,progress,experience,level,rank,avatar,email,birthplace,phone,status,is_online FROM Users WHERE uid=?",
         [req.params.uid],
         (err,row)=>{
 
