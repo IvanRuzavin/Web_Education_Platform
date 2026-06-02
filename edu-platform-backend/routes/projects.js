@@ -7,6 +7,7 @@ router.get("/:uid", (req, res) => {
   db.all(
     `
     SELECT
+      p.project_id,
       p.project_name,
       utp.score
     FROM UserToProject utp
