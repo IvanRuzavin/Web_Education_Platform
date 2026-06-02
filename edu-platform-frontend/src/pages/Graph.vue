@@ -56,6 +56,8 @@ const pic = ["PIC GPIO","PIC ADC","PIC PWM","PIC UART","PIC I2C","PIC SPI"];
 const riscv = ["RISCV GPIO","RISCV ADC","RISCV PWM","RISCV UART","RISCV I2C","RISCV SPI"];
 const pic32 = ["PIC32 GPIO","PIC32 ADC","PIC32 PWM","PIC32 UART","PIC32 I2C","PIC32 SPI"];
 
+const Pins = [110, 165, 220, 275, 330, 385];
+
 </script>
 
 <template>
@@ -177,43 +179,139 @@ const pic32 = ["PIC32 GPIO","PIC32 ADC","PIC32 PWM","PIC32 UART","PIC32 I2C","PI
 
         <!-- Array of Pins -->
         <g stroke="#475569" stroke-width="2">
-          <!-- Top and Bottom Rows -->
-          <rect x="100" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="140" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="180" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="220" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="260" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="300" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="340" y="24" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="380" y="24" width="16" height="20" fill="url(#pinGradH)"/>
 
-          <rect x="100" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="140" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="180" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="220" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="260" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="300" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="340" y="468" width="16" height="20" fill="url(#pinGradH)"/>
-          <rect x="380" y="468" width="16" height="20" fill="url(#pinGradH)"/>
+          <!-- TOP : ARM -->
+          <g v-for="(label, index) in arm" :key="'top-'+index">
+            <!-- pin -->
+            <rect
+              :x="Pins[index]"
+              y="5"
+              width="16"
+              height="40"
+              fill="url(#pinGradH)"
+            />
 
-          <!-- Left and Right Rows -->
-          <rect x="24" y="100" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="140" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="180" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="220" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="260" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="300" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="340" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="24" y="380" width="20" height="16" fill="url(#pinGradV)"/>
+            <!-- label box -->
+            <rect
+              :x="Pins[index] - 12"
+              y="-20"
+              width="40"
+              height="22"
+              rx="3"
+              fill="#1E293B"
+              stroke="#38BDF8"
+            />
 
-          <rect x="468" y="100" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="140" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="180" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="220" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="260" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="300" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="340" width="20" height="16" fill="url(#pinGradV)"/>
-          <rect x="468" y="380" width="20" height="16" fill="url(#pinGradV)"/>
+            <text
+              :x="Pins[index] + 8"
+              y="-6"
+              font-size="5"
+              fill="#fff"
+              text-anchor="middle"
+            >
+              {{ label }}
+            </text>
+          </g>
+
+          <!-- BOTTOM : PIC32 -->
+          <g v-for="(label, index) in pic32" :key="'bottom-'+index">
+            <!-- pin -->
+            <rect
+              :x="Pins[index]"
+              y="468"
+              width="16"
+              height="40"
+              fill="url(#pinGradH)"
+            />
+
+            <!-- label box -->
+            <rect
+              :x="Pins[index] - 12"
+              y="510"
+              width="40"
+              height="22"
+              rx="3"
+              fill="#1E293B"
+              stroke="#38BDF8"
+            />
+
+            <text
+              :x="Pins[index] + 8"
+              y="524"
+              font-size="5"
+              fill="#fff"
+              text-anchor="middle"
+            >
+              {{ label }}
+            </text>
+          </g>
+
+          <!-- LEFT : PIC -->
+          <g v-for="(label, index) in pic" :key="'left-'+index">
+            <!-- pin -->
+            <rect
+              x="-10"
+              :y="Pins[index]"
+              width="55"
+              height="16"
+              fill="url(#pinGradV)"
+            />
+
+            <!-- label box -->
+            <rect
+              x="-70"
+              :y="Pins[index] - 3"
+              width="60"
+              height="22"
+              rx="3"
+              fill="#1E293B"
+              stroke="#38BDF8"
+            />
+
+            <text
+              x="-40"
+              :y="Pins[index] + 11"
+              font-size="5"
+              fill="#fff"
+              text-anchor="middle"
+            >
+              {{ label }}
+            </text>
+          </g>
+
+          <!-- RIGHT : RISCV -->
+          <g v-for="(label, index) in riscv" :key="'right-'+index">
+            <!-- pin -->
+            <rect
+              x="465"
+              :y="Pins[index]"
+              width="55"
+              height="16"
+              fill="url(#pinGradV)"
+            />
+
+            <!-- label box -->
+            <rect
+              x="520"
+              :y="Pins[index] - 3"
+              width="60"
+              height="22"
+              rx="3"
+              fill="#1E293B"
+              stroke="#38BDF8"
+            />
+
+            <text
+              x="550"
+              :y="Pins[index] + 11"
+              font-size="5"
+              fill="#fff"
+              text-anchor="middle"
+            >
+              {{ label }}
+            </text>
+          </g>
+
         </g>
 
         <!-- Inner Heat Spreader (Die/Lid) -->
@@ -233,8 +331,6 @@ const pic32 = ["PIC32 GPIO","PIC32 ADC","PIC32 PWM","PIC32 UART","PIC32 I2C","PI
         <rect x="176" y="226" width="160" height="60" rx="8" fill="#1E293B" stroke="#0284C7" stroke-width="2"/>
         <text x="256" y="264" font-family="monospace" font-weight="bold" font-size="24" fill="#38BDF8" text-anchor="middle" letter-spacing="4" @click="openSite" style="cursor:pointer">MIKROE</text>
 
-        <!-- First Orientation Marker (Triangle Notch) -->
-        <polygon points="120,96 140,96 120,116" fill="#9CA3AF"/>
         </g>
       </svg>
 
