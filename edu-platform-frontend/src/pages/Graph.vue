@@ -1,18 +1,20 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import api from "../services/api";
 
 const router = useRouter();
+const route = useRoute();
 
 const user = ref(null);
-const uid = localStorage.getItem("uid");
+const myUid = localStorage.getItem("uid");
+const graphUid = route.query.uid || myUid;
 
 onMounted(async () => {
-  const userRes = await api.get(`/users/${uid}`);
-  user.value = userRes.data;
+  const meRes = await api.get(`/users/${myUid}`);
+  user.value = meRes.data;
 
-  const projectsRes = await api.get(`/projects/${uid}`);
+  const projectsRes = await api.get(`/projects/${graphUid}`);
 
   const map = {};
 
@@ -163,7 +165,7 @@ const getProjectColor = (label) => {
         @mouseup="stopDrag"
         @mouseleave="stopDrag"
       >
-        <g :transform="`translate(${pan.x}, ${pan.y}) scale(${scale * 3})`">
+        <g :transform="`translate(${pan.x}, ${pan.y}) scale(${scale})`">
         <defs>
           <!-- Metallic gradients for pins -->
           <linearGradient id="pinGradH" x1="0%" y1="0%" x2="0%" y2="100%">

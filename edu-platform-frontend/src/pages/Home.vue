@@ -232,7 +232,10 @@ onMounted(async () => {
 
           <button
             class="btn btn-primary w-100 mb-3"
-            @click="router.push('/graph')"
+            @click="router.push({
+              path: '/graph',
+              query: { uid: selectedUser.uid }
+            })"
           >
             Project Graph
           </button>
