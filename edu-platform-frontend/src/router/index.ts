@@ -4,6 +4,7 @@ import Login from "../pages/Login.vue";
 import Home from "../pages/Home.vue";
 import Settings from "../pages/Settings.vue";
 import Graph from "../pages/Graph.vue";
+import ProjectDetails from "../pages/ProjectDetails.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -15,6 +16,10 @@ const router = createRouter({
     {
       path: '/graph',
       component: Graph
+    },
+    {
+      path: '/projects/:projectId',
+      component: ProjectDetails
     },
     {
       path: '/settings',

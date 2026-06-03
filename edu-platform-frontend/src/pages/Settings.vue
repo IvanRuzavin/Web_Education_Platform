@@ -410,13 +410,14 @@ const avatarStock = [
 const uid = localStorage.getItem("uid");
 const router = useRouter();
 
-const user = ref(null);
+const user = ref<any>(null);
 
 const uidValue = ref("");
 const name = ref("");
 const surname = ref("");
 const avatar = ref("");
 const status = ref("");
+const readyForEvaluation = ref(false);
 
 const email = ref("");
 const birthplace = ref("");
@@ -432,6 +433,7 @@ onMounted(async () => {
   name.value = res.data.name;
   surname.value = res.data.surname;
   status.value = res.data.status;
+  readyForEvaluation.value = Boolean(res.data.ready_for_evaluation);
 
   avatar.value = res.data.avatar;
 
@@ -451,7 +453,8 @@ const save = async () => {
     phone: phone.value,
     is_online: 1,
 
-    status: status.value
+    status: status.value,
+    ready_for_evaluation: readyForEvaluation.value ? 1 : 0
   });
 
   alert("Profile updated");
@@ -632,6 +635,27 @@ const selectAvatar = (url: string) => {
 
             </div>
 
+            <div class="col-md-12 mt-3">
+
+              <div class="form-check form-switch evaluation-switch">
+                <input
+                  id="readyForEvaluation"
+                  class="form-check-input"
+                  type="checkbox"
+                  v-model="readyForEvaluation"
+                >
+
+                <label class="form-check-label" for="readyForEvaluation">
+                  I am ready to evaluate other students
+                </label>
+
+                <div class="form-text">
+                  When enabled, the platform can assign new project defense evaluations to you.
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
         </div>
@@ -749,6 +773,18 @@ const selectAvatar = (url: string) => {
   background-repeat: no-repeat;
 
   overflow: hidden;
+}
+
+
+.evaluation-switch {
+  padding: 16px 18px 16px 3.3rem;
+  border-radius: 16px;
+  background: rgba(13, 110, 253, 0.08);
+  border: 1px solid rgba(13, 110, 253, 0.18);
+}
+
+.evaluation-switch .form-check-label {
+  font-weight: 700;
 }
 
 </style>
