@@ -348,6 +348,22 @@ The evaluation system is the core educational mechanism.
 
 ------------------------------------------------------------------------
 
+# Current State
+
+At the moment there are following users created:
+
+| Login |	Password |	Full Name |
+| -------- | -------- | -------------|
+| iruzavin |	1234 |	Ivan Ruzavin |
+| sjacimovic |	1234 |	Strahinja Jacimovic |
+| szhuikova |	1234 |	Sofiia Zhuikova |
+| eniksic |	    1234 |	Esma Niksic |
+| pkresoja |	1234 |	Petar Kresoja |
+| nbacanin |	1234 |	Nebojsa Bacanin Dzakula |
+| szecic |	    1234 |	Stevan Zecic |
+
+------------------------------------------------------------------------
+
 # Package Dependencies
 
 Install:
